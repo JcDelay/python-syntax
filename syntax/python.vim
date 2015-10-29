@@ -66,12 +66,14 @@
 "
 "    python_highlight_builtins              Highlight builtin functions and
 "                                           objects
-"      python_highlight_builtin_objs        Highlight builtin objects only
-"      python_highlight_builtin_funcs       Highlight builtin functions only
+"    python_highlight_builtin_objs          Highlight builtin objects only
+"    python_highlight_builtin_funcs         Highlight builtin functions only
 "    python_highlight_exceptions            Highlight standard exceptions
 "    python_highlight_string_formatting     Highlight % string formatting
 "    python_highlight_string_format         Highlight str.format syntax
 "    python_highlight_string_templates      Highlight string.Template syntax
+"    python_highlight_string_type_annotations
+"                                           Highlight :param : type annotations
 "    python_highlight_indent_errors         Highlight indentation errors
 "    python_highlight_space_errors          Highlight trailing spaces
 "    python_highlight_doctests              Highlight doc-tests
@@ -138,6 +140,7 @@ if s:Enabled("g:python_highlight_all")
   call s:EnableByDefault("g:python_highlight_string_formatting")
   call s:EnableByDefault("g:python_highlight_string_format")
   call s:EnableByDefault("g:python_highlight_string_templates")
+  call s:EnableByDefault("g:python_highlight_string_type_annotations")
   call s:EnableByDefault("g:python_highlight_indent_errors")
   call s:EnableByDefault("g:python_highlight_space_errors")
   call s:EnableByDefault("g:python_highlight_doctests")
@@ -186,7 +189,7 @@ endif
 " Decorators (new in Python 2.4)
 "
 
-syn match   pythonDecorator	"@" display nextgroup=pythonDottedName skipwhite
+syn match   pythonDecorator	"@[a-zA-Z_][a-zA-Z0-9_]*" display nextgroup=pythonDottedName skipwhite
 if s:Python2Syntax()
   syn match   pythonDottedName "[a-zA-Z_][a-zA-Z0-9_]*\%(\.[a-zA-Z_][a-zA-Z0-9_]*\)*" display contained
 else
@@ -233,8 +236,8 @@ if s:Python2Syntax()
   " Python 2 strings
   syn region pythonString   start=+[bB]\='+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,@Spell
   syn region pythonString   start=+[bB]\="+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,@Spell
-  syn region pythonString   start=+[bB]\="""+ end=+"""+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,pythonDocTest2,pythonSpaceError,@Spell
-  syn region pythonString   start=+[bB]\='''+ end=+'''+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,pythonDocTest,pythonSpaceError,@Spell
+  syn region pythonMultiLineString   start=+[bB]\="""+ end=+"""+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,pythonDocTest2,pythonSpaceError,@Spell
+  syn region pythonMultiLineString   start=+[bB]\='''+ end=+'''+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,pythonDocTest,pythonSpaceError,@Spell
 else
   " Python 3 byte strings
   syn region pythonBytes		start=+[bB]'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonBytesError,pythonBytesContent,@Spell
@@ -264,22 +267,22 @@ if s:Python2Syntax()
   " Python 2 Unicode strings
   syn region pythonUniString  start=+[uU]'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,@Spell
   syn region pythonUniString  start=+[uU]"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,@Spell
-  syn region pythonUniString  start=+[uU]"""+ end=+"""+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,pythonDocTest2,pythonSpaceError,@Spell
-  syn region pythonUniString  start=+[uU]'''+ end=+'''+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,pythonDocTest,pythonSpaceError,@Spell
+  syn region pythonMultiLineUniString  start=+[uU]"""+ end=+"""+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,pythonDocTest2,pythonSpaceError,@Spell
+  syn region pythonMultiLineUniString  start=+[uU]'''+ end=+'''+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,pythonDocTest,pythonSpaceError,@Spell
 else
   " Python 3 strings
   syn region pythonString   start=+'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,@Spell
   syn region pythonString   start=+"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,@Spell
-  syn region pythonString   start=+"""+ end=+"""+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,pythonDocTest2,pythonSpaceError,@Spell
-  syn region pythonString   start=+'''+ end=+'''+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,pythonDocTest,pythonSpaceError,@Spell
+  syn region pythonMultiLineString   start=+"""+ end=+"""+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,pythonDocTest2,pythonSpaceError,@Spell
+  syn region pythonMultiLineString   start=+'''+ end=+'''+ keepend contains=pythonBytesEscape,pythonBytesEscapeError,pythonUniEscape,pythonUniEscapeError,pythonDocTest,pythonSpaceError,@Spell
 endif
 
 if s:Python2Syntax()
   " Python 2 Unicode raw strings
   syn region pythonUniRawString start=+[uU][rR]'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonRawEscape,pythonUniRawEscape,pythonUniRawEscapeError,@Spell
   syn region pythonUniRawString start=+[uU][rR]"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonRawEscape,pythonUniRawEscape,pythonUniRawEscapeError,@Spell
-  syn region pythonUniRawString start=+[uU][rR]"""+ end=+"""+ keepend contains=pythonUniRawEscape,pythonUniRawEscapeError,pythonDocTest2,pythonSpaceError,@Spell
-  syn region pythonUniRawString start=+[uU][rR]'''+ end=+'''+ keepend contains=pythonUniRawEscape,pythonUniRawEscapeError,pythonDocTest,pythonSpaceError,@Spell
+  syn region pythonMultiLineUniRawString start=+[uU][rR]"""+ end=+"""+ keepend contains=pythonUniRawEscape,pythonUniRawEscapeError,pythonDocTest2,pythonSpaceError,@Spell
+  syn region pythonMultiLineUniRawString start=+[uU][rR]'''+ end=+'''+ keepend contains=pythonUniRawEscape,pythonUniRawEscapeError,pythonDocTest,pythonSpaceError,@Spell
 
   syn match  pythonUniRawEscape       "\([^\\]\(\\\\\)*\)\@<=\\u\x\{4}" display contained
   syn match  pythonUniRawEscapeError  "\([^\\]\(\\\\\)*\)\@<=\\u\x\{,3}\X" display contained
@@ -289,13 +292,13 @@ endif
 if s:Python2Syntax()
   syn region pythonRawString  start=+[bB]\=[rR]'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonRawEscape,@Spell
   syn region pythonRawString  start=+[bB]\=[rR]"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonRawEscape,@Spell
-  syn region pythonRawString  start=+[bB]\=[rR]"""+ end=+"""+ keepend contains=pythonDocTest2,pythonSpaceError,@Spell
-  syn region pythonRawString  start=+[bB]\=[rR]'''+ end=+'''+ keepend contains=pythonDocTest,pythonSpaceError,@Spell
+  syn region pythonMultiLineRawString  start=+[bB]\=[rR]"""+ end=+"""+ keepend contains=pythonDocTest2,pythonSpaceError,@Spell
+  syn region pythonMultiLineRawString  start=+[bB]\=[rR]'''+ end=+'''+ keepend contains=pythonDocTest,pythonSpaceError,@Spell
 else
   syn region pythonRawString  start=+[rR]'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonRawEscape,@Spell
   syn region pythonRawString  start=+[rR]"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonRawEscape,@Spell
-  syn region pythonRawString  start=+[rR]"""+ end=+"""+ keepend contains=pythonDocTest2,pythonSpaceError,@Spell
-  syn region pythonRawString  start=+[rR]'''+ end=+'''+ keepend contains=pythonDocTest,pythonSpaceError,@Spell
+  syn region pythonMultiLineRawString  start=+[rR]"""+ end=+"""+ keepend contains=pythonDocTest2,pythonSpaceError,@Spell
+  syn region pythonMultiLineRawString  start=+[rR]'''+ end=+'''+ keepend contains=pythonDocTest,pythonSpaceError,@Spell
 
   syn region pythonRawBytes  start=+[bB][rR]'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonRawEscape,@Spell
   syn region pythonRawBytes  start=+[bB][rR]"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonRawEscape,@Spell
@@ -344,6 +347,17 @@ if s:Enabled("g:python_highlight_doctests")
   " DocTests
   syn region pythonDocTest	start="^\s*>>>" end=+'''+he=s-1 end="^\s*$" contained
   syn region pythonDocTest2	start="^\s*>>>" end=+"""+he=s-1 end="^\s*$" contained
+endif
+
+if s:Enabled("g:python_highlight_string_type_annotations")
+  " Type annotations
+    syn match pythonStrTypeAnnotation "^\s*:param [a-zA-Z_][a-zA-Z0-9_]\+:" contained containedin=pythonMultiLineString,pythonMultiLineUniString,pythonMultiLineUniRawString,pythonMultiLineRawString
+    syn match pythonStrTypeAnnotation "^\s*:type [a-zA-Z_][a-zA-Z0-9_]\+:" contained containedin=pythonMultiLineString,pythonMultiLineUniString,pythonMultiLineUniRawString,pythonMultiLineRawString
+    syn match pythonStrTypeAnnotation "^\s*:type:" contained containedin=pythonMultiLineString,pythonMultiLineUniString,pythonMultiLineUniRawString,pythonMultiLineRawString
+    syn match pythonStrTypeAnnotation "^\s*:return:" contained containedin=pythonMultiLineString,pythonMultiLineUniString,pythonMultiLineUniRawString,pythonMultiLineRawString
+    syn match pythonStrTypeAnnotation "^\s*:raise:" contained containedin=pythonMultiLineString,pythonMultiLineUniString,pythonMultiLineUniRawString,pythonMultiLineRawString
+    syn match pythonStrTypeAnnotation "^\s*:rtype:" contained containedin=pythonMultiLineString,pythonMultiLineUniString,pythonMultiLineUniRawString,pythonMultiLineRawString
+    syn match pythonStrTypeAnnotation "^\s*:see:" contained containedin=pythonMultiLineString,pythonMultiLineUniString,pythonMultiLineUniRawString,pythonMultiLineRawString
 endif
 
 "
@@ -517,12 +531,17 @@ if version >= 508 || !exists("did_python_syn_inits")
   HiLink pythonString           String
   HiLink pythonRawString        String
 
+  HiLink pythonMultiLineString      String
+  HiLink pythonMultiLineRawString   String
+
   HiLink pythonUniEscape        Special
   HiLink pythonUniEscapeError   Error
 
   if s:Python2Syntax()
     HiLink pythonUniString          String
     HiLink pythonUniRawString       String
+    HiLink pythonMultiLineUniString      String
+    HiLink pythonMultiLineUniRawString   String
     HiLink pythonUniRawEscape       Special
     HiLink pythonUniRawEscapeError  Error
   else
@@ -537,6 +556,7 @@ if version >= 508 || !exists("did_python_syn_inits")
   HiLink pythonStrFormatting    Special
   HiLink pythonStrFormat        Special
   HiLink pythonStrTemplate      Special
+  HiLink pythonStrTypeAnnotation    Special
 
   HiLink pythonDocTest          Special
   HiLink pythonDocTest2         Special
