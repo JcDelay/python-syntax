@@ -358,6 +358,9 @@ if s:Enabled("g:python_highlight_string_type_annotations")
     syn match pythonStrTypeAnnotation "^\s*:raise:" contained containedin=pythonMultiLineString,pythonMultiLineUniString,pythonMultiLineUniRawString,pythonMultiLineRawString
     syn match pythonStrTypeAnnotation "^\s*:rtype:" contained containedin=pythonMultiLineString,pythonMultiLineUniString,pythonMultiLineUniRawString,pythonMultiLineRawString
     syn match pythonStrTypeAnnotation "^\s*:see:" contained containedin=pythonMultiLineString,pythonMultiLineUniString,pythonMultiLineUniRawString,pythonMultiLineRawString
+    syn match pythonStrTypeAnnotation ":meth:`\w\+`" contained containedin=pythonMultiLineString,pythonMultiLineUniString,pythonMultiLineUniRawString,pythonMultiLineRawString
+    syn match pythonStrTypeAnnotation ":class:`\w\+`" contained containedin=pythonMultiLineString,pythonMultiLineUniString,pythonMultiLineUniRawString,pythonMultiLineRawString
+    syn match pythonStrTypeAnnotation ":func:`\w\+`" contained containedin=pythonMultiLineString,pythonMultiLineUniString,pythonMultiLineUniRawString,pythonMultiLineRawString
 endif
 
 "
